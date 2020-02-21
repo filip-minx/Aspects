@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.271
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minx.Aspects", "Minx.Aspects\Minx.Aspects.csproj", "{2CC2C17E-E8D1-4914-B2A1-1B0D1FD22B4C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minx.Aspects.Example", "Minx.Aspects.Example\Minx.Aspects.Example.csproj", "{B92F210A-E60D-4EC1-A262-47EFBA14A8B5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{2CC2C17E-E8D1-4914-B2A1-1B0D1FD22B4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2CC2C17E-E8D1-4914-B2A1-1B0D1FD22B4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2CC2C17E-E8D1-4914-B2A1-1B0D1FD22B4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B92F210A-E60D-4EC1-A262-47EFBA14A8B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B92F210A-E60D-4EC1-A262-47EFBA14A8B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B92F210A-E60D-4EC1-A262-47EFBA14A8B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B92F210A-E60D-4EC1-A262-47EFBA14A8B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
