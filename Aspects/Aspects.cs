@@ -6,9 +6,6 @@ using System.Reflection;
 
 namespace Minx.Aspects
 {
-    /// <summary>
-    /// Class providing support for aspect oriented programming paradigm.
-    /// </summary>
     public static class Aspects
     {
         private static bool initialized = false;
@@ -29,30 +26,26 @@ namespace Minx.Aspects
 
             var aspectTypes = AppDomain.CurrentDomain
                 .GetAssemblies()
-                .Select(assembly => assembly.GetTypes()
+                .Select(assembly => assembly
+                    .GetTypes()
                     .Where(type => type.GetCustomAttribute<AspectAttribute>() != null))
                 .Aggregate((a, b) => a.Concat(b));
 
             foreach (var aspectType in aspectTypes)
             {
-                var aspectOfType = aspectType.GetCustomAttribute<AspectAttribute>().TargetType;
+                var aspectTargetType = aspectType.GetCustomAttribute<AspectAttribute>().TargetType;
 
-                var interceptorConstructor = typeof(AspectInterceptor<>).MakeGenericType(aspectOfType).GetConstructors()[0];
+                var aspectInterceptor = Activator.CreateInstance(
+                    type: typeof(AspectInterceptor<>).MakeGenericType(aspectTargetType),
+                    args: new object[] { Activator.CreateInstance(aspectType) });
 
-                var aspectInstance = aspectType.GetConstructor(Array.Empty<Type>()).Invoke(Array.Empty<object>());
-
-                var interceptorInstance = interceptorConstructor.Invoke(new object[] { aspectInstance });
-
-                interceptorInstance.GetType().GetProperty("AspectImplementation").GetSetMethod().Invoke(interceptorInstance, new object[] { aspectInstance });
-                
-                
-                if (!TypeAspects.TryGetValue(aspectOfType, out var aspectsList))
+                if (!TypeAspects.TryGetValue(aspectTargetType, out var aspectsList))
                 {
                     aspectsList = new List<IInterceptor>();
-                    TypeAspects.Add(aspectOfType, aspectsList);
+                    TypeAspects.Add(aspectTargetType, aspectsList);
                 }
 
-                aspectsList.Add(interceptorInstance as IInterceptor);
+                aspectsList.Add(aspectInterceptor as IInterceptor);
             }
         }
 
@@ -65,10 +58,7 @@ namespace Minx.Aspects
                 return interceptor as IInterceptor;
             }).ToList();
 
-            if (ProxyUtil.IsProxy(target))
-            {
-                target = (TTarget)(target as IProxyTargetAccessor).DynProxyGetTarget();
-            }
+            target = GetUnproxiedInstance(target);
 
             var targetType = target.GetType();
             var interfaces = targetType.GetInterfaces();
@@ -87,14 +77,10 @@ namespace Minx.Aspects
 
         public static TTarget AddAspects<TTarget>(TTarget target)
         {
-            if (ProxyUtil.IsProxy(target))
-            {
-                target = (TTarget)(target as IProxyTargetAccessor).DynProxyGetTarget();
-            }
+            target = GetUnproxiedInstance(target);
 
             var targetType = target.GetType();
             var interfaces = targetType.GetInterfaces();
-
             
             if (!TypeAspects.TryGetValue(interfaces[0], out var aspectInterceptors))
             {
@@ -106,6 +92,13 @@ namespace Minx.Aspects
                 additionalInterfacesToProxy: interfaces,
                 target: target,
                 interceptors: aspectInterceptors.ToArray());
+        }
+
+        private static T GetUnproxiedInstance<T>(T proxy)
+        {
+            return ProxyUtil.IsProxy(proxy)
+                ? (T)(proxy as IProxyTargetAccessor).DynProxyGetTarget()
+                : proxy;
         }
     }
 }

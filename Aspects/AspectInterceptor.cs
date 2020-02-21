@@ -8,13 +8,12 @@ namespace Minx.Aspects
 {
     internal class AspectInterceptor<T> : IInterceptor
     {
-        public object AspectImplementation { get; set; }
+        private readonly Action<IInvocation> setInvocationDelegate = null;
 
-        private Action<IInvocation> setInvocationDelegate = null;
+        public object AspectImplementation { get; set; }
 
         public AspectInterceptor(T aspectImplementation)
         {
-            
             AspectImplementation = aspectImplementation;
 
             var invocationProperties = AspectImplementation.GetType()
@@ -26,17 +25,15 @@ namespace Minx.Aspects
                 throw new InvalidOperationException("Multiple attributes 'AspectInvocation' cannot be used in the same class.");
             }
 
-            if (!invocationProperties.Any())
+            if (invocationProperties.Any())
             {
-                throw new InvalidOperationException("No IInvocation property setter.");
-            }
-
-            var setInvocationMethodInfo = invocationProperties
+                var setInvocationMethodInfo = invocationProperties
                 .First()
                 .GetSetMethod(true);
 
-            setInvocationDelegate = (Action<IInvocation>)
-                Delegate.CreateDelegate(typeof(Action<IInvocation>), AspectImplementation, setInvocationMethodInfo);
+                setInvocationDelegate = (Action<IInvocation>)
+                    Delegate.CreateDelegate(typeof(Action<IInvocation>), AspectImplementation, setInvocationMethodInfo);
+            }
         }
 
         [DebuggerHidden]
@@ -44,7 +41,7 @@ namespace Minx.Aspects
         {
             var proxy = new InvocationProxy(invocation);
 
-            setInvocationDelegate.Invoke(proxy);
+            setInvocationDelegate?.Invoke(proxy);
             
             invocation.Method.Invoke(AspectImplementation, invocation.Arguments);
 
@@ -54,5 +51,4 @@ namespace Minx.Aspects
             }
         }
     }
-
 }

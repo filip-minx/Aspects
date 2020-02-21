@@ -62,5 +62,4 @@ namespace Minx.Aspects
             invocation.SetArgumentValue(index, value);
         }
     }
-
 }
