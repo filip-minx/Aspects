@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>Minx.Aspects</AssemblyName>
-    <RootNamespace>Minx.Aspects</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
